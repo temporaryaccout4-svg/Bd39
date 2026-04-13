@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  transition:0.6s;
+  color:white;
+}
+
+/* THEMES */
+.dark{background:black;}
+.birthday{
+  background: linear-gradient(-45deg,#ff9a9e,#fad0c4,#fbc2eb,#a18cd1);
+  background-size:400% 400%;
+  animation:bg 10s infinite;
+}
+.count{background:#000;}
+.wait{background: radial-gradient(circle,#a18cd1,#000);}
+.proposalBg{background:black;}
+
+@keyframes bg{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* SCREENS */
+.screen{
+  display:none;
+  height:100vh;
+  width:100vw;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+}
+.show{display:flex;}
+
+/* INPUT */
+input{
+  padding:14px;
+  width:70%;
+  border-radius:20px;
+  border:2px solid #ff4d6d;
+}
+
+/* BUTTON */
+button{
+  padding:14px 25px;
+  border:none;
+  border-radius:25px;
+  background:#ff4d6d;
+  color:white;
+  margin-top:10px;
+}
+
+/* PHOTO */
+#photo{
+  width:70vw;
+  height:70vw;
+  border-radius:20px;
+  object-fit:cover;
+}
+
+/* TEXT */
+#wish{font-size:4vw;}
+
+/* COUNT */
+#count{font-size:20vw;}
+
+/* ROAM BUTTON */
+#yesBtn{position:relative;}
+@keyframes roam{
+  0%{transform:translate(0);}
+  25%{transform:translate(60px,-40px);}
+  50%{transform:translate(-60px,40px);}
+  75%{transform:translate(60px,60px);}
+  100%{transform:translate(0);}
+}
+.roaming{animation:roam 0.3s infinite;}
+
+/* HEARTS */
+.heart{
+  position:absolute;
+  animation:float 6s linear infinite;
+}
+@keyframes float{
+  from{transform:translateY(100vh);}
+  to{transform:translateY(-10vh);}
+}
+
+/* PROPOSAL */
+#proposalImg{
+  width:90%;
+  opacity:0;
+  transform:translateY(150px) scale(0.6);
+  transition:all 3s ease;
+}
+
+/* PULSE */
+@keyframes pulse{
+  0%{opacity:1;}
+  50%{opacity:0;}
+  100%{opacity:1;}
+}
+
+/* PAPER OPEN */
+@keyframes paper{
+  0%{transform:scaleX(0.2);}
+  100%{transform:scaleX(1);}
+}
+.paperOpen{animation:paper 2s forwards;}
+
+</style>
+</head>
+
+<body class="dark">
+
+<!-- LOGIN -->
+<div id="login" class="screen show">
+  <h2>Enter Password</h2>
+  <input id="pass">
+  <button onclick="unlock()">Unlock</button>
+  <p id="error"></p>
+</div>
+
+<!-- MAIN -->
+<div id="main" class="screen">
+  <img id="photo" src="photo1.jpg">
+  <p id="wish"></p>
+  <button onclick="start()">Tap 💖</button>
+</div>
+
+<!-- COUNT -->
+<div id="countScreen" class="screen">
+  <h1 id="count">5</h1>
+</div>
+
+<!-- READY -->
+<div id="readyScreen" class="screen">
+  <h2>Are you ready?</h2>
+  <button id="yesBtn" onclick="goNext()">Yes 💕</button>
+</div>
+
+<!-- WAIT -->
+<div id="waitScreen" class="screen">
+  <h2 id="waitText">Something special coming...</h2>
+  <p id="funText"></p>
+</div>
+
+<!-- PROPOSAL -->
+<div id="proposal" class="screen">
+  <img id="proposalImg" src="proposal-card.jpg">
+</div>
+
+<audio id="boom" src="boom.mp3"></audio>
+<audio id="music" src="makhamali.mp3"></audio>
+
+<script>
+
+const body=document.body;
+const boom=document.getElementById("boom");
+const music=document.getElementById("music");
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("show"));
+  document.getElementById(id).classList.add("show");
+}
+
+/* PASSWORD */
+function unlock(){
+  let val=pass.value.toLowerCase();
+  if(val==="angry bird"){
+    boom.play();
+    body.className="birthday";
+    show("main");
+    typeText();
+    hearts();
+  }else{
+    error.innerText="Wrong password";
+  }
+}
+
+/* TEXT */
+let text=`Wishing you a very happy and joyful birthday 🎂💗
+May your life always be filled with happiness, love, and success.
+May all your dreams and wishes come true.
+It’s not just your birthday… it’s the day someone special like you came into this world and made my life better in many ways.
+You’ve become someone really special to me. Stay the same, my favourite Angry Bird 🐦❤️
+Once again, happy birthday to my special person 💗✨`;
+
+let i=0;
+function typeText(){
+  let t=setInterval(()=>{
+    wish.innerHTML+=text.charAt(i++);
+    if(i>=text.length) clearInterval(t);
+  },60);
+}
+
+/* PHOTO */
+let photos=["photo1.jpg","photo2.jpg","photo3.jpg","photo4.jpg"];
+setInterval(()=>{
+  if(photo) photo.src=photos[Math.floor(Math.random()*photos.length)];
+},2500);
+
+/* HEARTS */
+function hearts(){
+  setInterval(()=>{
+    let h=document.createElement("div");
+    h.className="heart";
+    h.innerHTML="💗";
+    h.style.left=Math.random()*100+"%";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),6000);
+  },300);
+}
+
+/* START */
+function start(){
+  boom.pause();
+  body.className="count";
+  show("countScreen");
+
+  let c=5;
+  let t=setInterval(()=>{
+    c--;
+    count.innerText=c;
+
+    if(c==0){
+      clearInterval(t);
+      music.play();
+      body.className="wait";
+      show("readyScreen");
+      roam();
+    }
+  },1000);
+}
+
+/* ROAM */
+function roam(){
+  yesBtn.classList.add("roaming");
+  setTimeout(()=>yesBtn.classList.remove("roaming"),5000);
+}
+
+/* WAIT */
+let funny=["Wait 😏","Don't blink 👀","Almost there 💓"];
+
+function goNext(){
+  show("waitScreen");
+
+  let i=0;
+  setInterval(()=>{
+    funText.innerText=funny[i%funny.length];
+    i++;
+  },2000);
+
+  setTimeout(()=>climax(),20000);
+}
+
+/* CLIMAX */
+function climax(){
+  showProposal();
+}
+
+/* 💎 LEGENDARY ENTRY */
+function showProposal(){
+
+  body.className="proposalBg";
+  show("proposal");
+
+  let img=proposalImg;
+
+  let roam=0;
+
+  let r=setInterval(()=>{
+    img.style.opacity="0.5";
+    img.style.transform=
+      `translate(${Math.random()*80-40}px,${Math.random()*80-40}px) scale(0.6)`;
+
+    if(++roam>8){
+      clearInterval(r);
+
+      // center slow
+      setTimeout(()=>{
+        img.style.opacity="1";
+        img.style.transform="translate(0,0) scale(1)";
+      },300);
+
+      // pulse
+      setTimeout(()=>{
+        img.style.animation="pulse 0.5s 3";
+      },3000);
+
+      // final reveal
+      setTimeout(()=>{
+        img.classList.add("paperOpen");
+      },5000);
+    }
+
+  },200);
+}
+
+</script>
+</body>
+</html>
